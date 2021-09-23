@@ -9,16 +9,10 @@ namespace Data_Pipeline
 {
     class Program
     {
-
         static void Main(string[] args)
         {
             var dataJson = File.ReadAllText("./data/generic.json");
             var dataSet = JsonSerializer.Deserialize<List<DataStructure>>(dataJson);
-
-            // Action<int, int, int> action1 = (a, b, c) => File.AppendAllText("./data/out.csv", $"A: {a}, B: {b}, C: {c}, A+B: {a + b}\n");
-            // foreach (var a in dataSet)
-            //     action1(a.A, a.B, a.C);
-
 
             var fnDict = new Dictionary<string, Action<string, string, DataStructure>>()
             {
@@ -48,8 +42,6 @@ namespace Data_Pipeline
                     fnDict[input](input1, input2, a);
                 Console.WriteLine("Done! Results are written to ./data/out.json");
             }
-
-
 
             else //mutation
             {

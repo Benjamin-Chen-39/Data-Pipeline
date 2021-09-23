@@ -20,46 +20,54 @@ namespace Data_Pipeline
             //     action1(a.A, a.B, a.C);
 
 
-            var fnDict2 = new Dictionary<string, Action<string, string, DataStructure>>()
+            var fnDict = new Dictionary<string, Action<string, string, DataStructure>>()
             {
-                {"sum", (colOne, colTwo, colData) => {
-                    if (colOne == "A" && colTwo == "B")
-                    File.AppendAllText("./data/out.csv", $"A: {colData.A}, B: {colData.B}, C: {colData.C}, D(sum): {colData.A + colData.B}\n");
-                    else if (colOne == "A" && colTwo == "C")
-                    File.AppendAllText("./data/out.csv", $"A: {colData.A}, B: {colData.B}, C: {colData.C}, D(sum): {colData.A + colData.C}\n");
-                    else if (colOne == "B" && colTwo == "C")
-                    File.AppendAllText("./data/out.csv", $"A: {colData.A}, B: {colData.B}, C: {colData.C}, D(sum): {colData.B + colData.C}\n");
-                        }
-                    },
+                {"sum", (colOne, colTwo, colData) => File.AppendAllText("./data/out.csv", $"A: {colData.A}, B: {colData.B}, C: {colData.C}, D(sum): {Convert.ToInt16(typeof(DataStructure).GetProperty(colOne).GetValue(colData)) + Convert.ToInt16(typeof(DataStructure).GetProperty(colTwo).GetValue(colData))}\n")
 
-                {"product", (colOne, colTwo, colData) => {
-                    if (colOne == "A" && colTwo == "B")
-                    File.AppendAllText("./data/out.csv", $"A: {colData.A}, B: {colData.B}, C: {colData.C}, E(product): {colData.A * colData.B}\n");
-                    else if (colOne == "A" && colTwo == "C")
-                    File.AppendAllText("./data/out.csv", $"A: {colData.A}, B: {colData.B}, C: {colData.C}, E(product): {colData.A * colData.C}\n");
-                    else if (colOne == "B" && colTwo == "C")
-                    File.AppendAllText("./data/out.csv", $"A: {colData.A}, B: {colData.B}, C: {colData.C}, E(product): {colData.B * colData.C}\n");
-                        }
-                    },
+            },
+
+               {"product", (colOne, colTwo, colData) => File.AppendAllText("./data/out.csv", $"A: {colData.A}, B: {colData.B}, C: {colData.C}, E(product): {Convert.ToInt16(typeof(DataStructure).GetProperty(colOne).GetValue(colData)) * Convert.ToInt16(typeof(DataStructure).GetProperty(colTwo).GetValue(colData))}\n")
+
+                },
             };
 
-            var fnDict = new Dictionary<string, Action<int, int, int>>()
-            {
-                {"sum", (A, B, C) => File.AppendAllText("./data/out.csv", $"A: {A}, B: {B}, C: {C}, D(sum): {A + B}\n")},
-                {"product", (A, B, C) => File.AppendAllText("./data/out.csv", $"A: {A}, B: {B}, C: {C}, E(product): {A * B}\n")},
-            };
-
+            //UI
             foreach (var a in dataSet)
                 Console.WriteLine(a);
-            //UI
-            Console.WriteLine("Here's your data, you can sum or multiply the columns. Type \"sum\" to add 2 columns, type \"product\" to multiply 2 columns.");
+            Console.WriteLine("Here's your data, you can type \"sum\" to add 2 columns, \"product\" to multiply 2 columns, or \"mutate\" to mutate a column.");
+
             var input = Console.ReadLine();
-            Console.WriteLine("Enter two columns: ");
-            var input1 = Console.ReadLine();
-            var input2 = Console.ReadLine();
-            // var input = "sum";
-            foreach (var a in dataSet)
-                fnDict2[input](input1, input2, a);
+
+            if (input == "sum" || input == "product")
+            {
+                Console.WriteLine("Enter two columns: ");
+                var input1 = Console.ReadLine();
+                var input2 = Console.ReadLine();
+
+                foreach (var a in dataSet)
+                    fnDict[input](input1, input2, a);
+                Console.WriteLine("Done! Results are written to ./data/out.json");
+            }
+
+
+
+            else //mutation
+            {
+                Console.WriteLine("Enter a column to mutate on: ");
+                var mutateCol = Console.ReadLine();
+
+                foreach (var col in dataSet)
+                {
+                    if (mutateCol == "A")
+                        File.AppendAllText("./data/out.csv", $"A: {col.A.Mutate()}, B: {col.B}, C: {col.C}\n");
+                    else if (mutateCol == "B")
+                        File.AppendAllText("./data/out.csv", $"A: {col.A}, B: {col.B.Mutate()}, C: {col.C}\n");
+                    else if (mutateCol == "C")
+                        File.AppendAllText("./data/out.csv", $"A: {col.A}, B: {col.B}, C: {col.C.Mutate()}\n");
+                }
+                Console.WriteLine("Done! Results are written to ./data/out.json");
+            }
+
 
         }
     }
